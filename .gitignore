@@ -4,3 +4,12 @@
 
 # Dynamic plugins .dll
 bin/
+
+
+# Added by cargo
+
+/target
+error.md
+tree.diff
+.test.js
+temp.jsonc
