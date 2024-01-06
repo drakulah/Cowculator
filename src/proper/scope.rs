@@ -1,9 +1,27 @@
-use super::{ProperFnCall, ProperScope};
+use super::{ProperFnCall, ProperScope, OpPriority};
 
 impl ProperScope {
   pub fn is_operator(&self) -> bool {
     match self {
       ProperScope::ProperOpLiteral(_) => true,
+      _ => false,
+    }
+  }
+  pub fn is_high_priority_op(&self) -> bool {
+    match self {
+      ProperScope::ProperOpLiteral(it) => it.priority == OpPriority::High,
+      _ => false,
+    }
+  }
+  pub fn is_medium_priority_op(&self) -> bool {
+    match self {
+      ProperScope::ProperOpLiteral(it) => it.priority == OpPriority::Medium,
+      _ => false,
+    }
+  }
+  pub fn is_low_priority_op(&self) -> bool {
+    match self {
+      ProperScope::ProperOpLiteral(it) => it.priority == OpPriority::Low,
       _ => false,
     }
   }
