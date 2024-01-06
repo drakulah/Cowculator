@@ -9,8 +9,8 @@ pub mod proper;
 pub mod utils;
 
 fn main() {
-  // let code = r#"1 + 2 - 3 * 4 % 5 - 6"#;
-  let code = r#"1 + 1 - 2 * 3 / 2 - 6 + 2 + 1 % 9 + 7 * 8 % 6"#;
+  let code = r#"(1 + 2 - 3 * 4 % 5 - 6)"#;
+  // let code = r#"1 + 1 - 2 * 3 / 2 - 6 + 2 + 1 % 9 + 7 * 8 % 6"#;
   // let code = r#"2 + 5 - 5 * PI - (12 + 4) - 0b101010 + 0xffffff"#;
 
   let err_config = ErrorConfig::new(code.to_string(), 15);

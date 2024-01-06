@@ -216,19 +216,19 @@ impl Proper {
         TokenType::Mod => {
           scope.push(ProperScope::ProperOpLiteral(ProperOpLiteral {
             value: tkn.lexeme.clone(),
-            priority: OpPriority::High,
+            priority: OpPriority::Medium,
           }));
         }
         TokenType::Star => {
           scope.push(ProperScope::ProperOpLiteral(ProperOpLiteral {
             value: tkn.lexeme.clone(),
-            priority: OpPriority::Medium,
+            priority: OpPriority::High,
           }));
         }
         TokenType::Slash => {
           scope.push(ProperScope::ProperOpLiteral(ProperOpLiteral {
             value: tkn.lexeme.clone(),
-            priority: OpPriority::Medium,
+            priority: OpPriority::High,
           }));
         }
         TokenType::Plus => {

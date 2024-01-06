@@ -1,7 +1,7 @@
 use crate::{
   error::ErrorViewConfig,
   lexer::Tokenizer,
-  proper::{OpPriority, ProperScope},
+  proper::{OpPriority, ProperIntLiteral, ProperOpLiteral, ProperScope},
 };
 
 use super::{Branch, Parser, Tree};
@@ -17,7 +17,26 @@ impl Parser {
     tokenizer: &Tokenizer,
   ) -> Result<Tree, ErrorViewConfig> {
     let mut i = 0;
-    self.parse_low_priority_op(&mut i, &scope, tokenizer)
+
+    if scope.len() == 1 {
+      return Ok(Tree {
+        op: Some(ProperOpLiteral {
+          value: "+".to_string(),
+          priority: OpPriority::Low,
+        }),
+        left: Some(Box::new(Branch::ProperScope(scope[i].clone()))),
+        right: Some(Box::new(Branch::ProperScope(
+          ProperScope::ProperIntLiteral(ProperIntLiteral {
+            value: 0,
+            inline_fn: None,
+          }),
+        ))),
+      });
+    } else if scope.len() > 2 {
+      return self.parse_low_priority_op(&mut i, &scope, tokenizer);
+    } else {
+      return Err(tokenizer.err_config.lex_unknown_err(0));
+    }
   }
 
   fn parse_high_priority_op(
