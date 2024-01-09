@@ -3,7 +3,7 @@ use crate::{utils::StrShortHand, lexer::Token};
 use super::{CowErrorKind, ErrorConfig, ErrorViewConfig};
 
 impl ErrorConfig {
-  pub fn parse_unexpected_token<S: AsRef<str>>(&self, expected: S, tkn: Token) -> ErrorViewConfig {
+  pub fn parse_unexpected_token<S: AsRef<str>>(&self, _expected: S, tkn: Token) -> ErrorViewConfig {
 
     let pre = self.text.get(0..45).unwrap_or_default().to_string();
 

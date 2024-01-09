@@ -246,25 +246,16 @@ impl Parser {
         _ => {
           if ast.right.is_none() {
             let next_op_index = *i + 1;
-            if next_op_index < scope.len() && scope[next_op_index].is_high_priority_op() {
-              match self.parse_high_priority_op(i, scope, tokenizer) {
-                Ok(parsed) => ast.right = Some(Box::new(Branch::Tree(parsed))),
-                Err(e) => {
-                  return Err(e);
-                }
-              }
-              continue;
-            } else if next_op_index < scope.len() && scope[next_op_index].is_medium_priority_op() {
+
+            if next_op_index < scope.len() && !scope[next_op_index].is_low_priority_op() {
               match self.parse_medium_priority_op(i, scope, tokenizer) {
                 Ok(parsed) => ast.right = Some(Box::new(Branch::Tree(parsed))),
-                Err(e) => {
-                  return Err(e);
-                }
+                Err(e) => return Err(e),
               }
               continue;
-            } else {
-              ast.right = Some(Box::new(Branch::ProperScope(token.clone())));
             }
+
+            ast.right = Some(Box::new(Branch::ProperScope(token.clone())));
           } else {
             return Err(tokenizer.err_config.lex_unknown_err(0));
           }
