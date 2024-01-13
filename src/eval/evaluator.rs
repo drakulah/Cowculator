@@ -18,6 +18,14 @@ impl Eval {
     }
   }
 
+  pub fn set_constant(&mut self, label: &str, value: f64) {
+    self.constants.insert(label.to_string(), value);
+  }
+
+  pub fn set_inline_fn(&mut self, label: &str, value: fn(Vec<f64>) -> f64) {
+    self.inline_fn.insert(label.to_string(), value);
+  }
+
   pub fn compile_usedef_fn(
     &self,
     func: ProperFnCall,
@@ -156,63 +164,67 @@ impl Eval {
 
   pub fn compile(
     &self,
-    ast: Tree,
+    tree: Option<Tree>,
     tokenizer: &Tokenizer,
     parser: &Parser,
   ) -> Result<f64, ErrorViewConfig> {
-    let left: Option<f64>;
-    let right: Option<f64>;
+    if let Some(ast) = tree {
+      let left: Option<f64>;
+      let right: Option<f64>;
 
-    match ast.left {
-      Some(lhs) => match *lhs {
-        Branch::ProperScope(scope) => match self.compile_scope(scope, tokenizer, parser) {
-          Ok(res) => left = Some(res),
-          Err(e) => return Err(e),
+      match ast.left {
+        Some(lhs) => match *lhs {
+          Branch::ProperScope(scope) => match self.compile_scope(scope, tokenizer, parser) {
+            Ok(res) => left = Some(res),
+            Err(e) => return Err(e),
+          },
+          Branch::Tree(inner_tree) => match self.compile(Some(inner_tree), tokenizer, parser) {
+            Ok(res) => left = Some(res),
+            Err(e) => return Err(e),
+          },
         },
-        Branch::Tree(tree) => match self.compile(tree, tokenizer, parser) {
-          Ok(res) => left = Some(res),
-          Err(e) => return Err(e),
-        },
-      },
-      None => left = None,
-    }
+        None => left = None,
+      }
 
-    if left.is_none() {
-      // TODO: LHS cannot be empty
+      if left.is_none() {
+        // TODO: LHS cannot be empty
+        return Err(tokenizer.err_config.lex_unknown_err(0));
+      }
+
+      match ast.right {
+        Some(rhs) => match *rhs {
+          Branch::ProperScope(scope) => match self.compile_scope(scope, tokenizer, parser) {
+            Ok(res) => right = Some(res),
+            Err(e) => return Err(e),
+          },
+          Branch::Tree(inner_tree) => match self.compile(Some(inner_tree), tokenizer, parser) {
+            Ok(res) => right = Some(res),
+            Err(e) => return Err(e),
+          },
+        },
+        None => right = None,
+      }
+
+      if right.is_none() {
+        // TODO: RHS cannot be empty
+        return Err(tokenizer.err_config.lex_unknown_err(0));
+      }
+
+      if let Some(op) = ast.op {
+        match op.value.as_str() {
+          "*" => return Ok(left.unwrap() * right.unwrap()),
+          "/" => return Ok(left.unwrap() / right.unwrap()),
+          "%" => return Ok(left.unwrap() % right.unwrap()),
+          "+" => return Ok(left.unwrap() + right.unwrap()),
+          "-" => return Ok(left.unwrap() - right.unwrap()),
+          _ => {}
+        };
+      }
+
+      // TODO: Operator cannot be empty
       return Err(tokenizer.err_config.lex_unknown_err(0));
+    } else {
+      Ok(0.0)
     }
-
-    match ast.right {
-      Some(rhs) => match *rhs {
-        Branch::ProperScope(scope) => match self.compile_scope(scope, tokenizer, parser) {
-          Ok(res) => right = Some(res),
-          Err(e) => return Err(e),
-        },
-        Branch::Tree(tree) => match self.compile(tree, tokenizer, parser) {
-          Ok(res) => right = Some(res),
-          Err(e) => return Err(e),
-        },
-      },
-      None => right = None,
-    }
-
-    if right.is_none() {
-      // TODO: RHS cannot be empty
-      return Err(tokenizer.err_config.lex_unknown_err(0));
-    }
-
-    if let Some(op) = ast.op {
-      match op.value.as_str() {
-        "*" => return Ok(left.unwrap() * right.unwrap()),
-        "/" => return Ok(left.unwrap() / right.unwrap()),
-        "%" => return Ok(left.unwrap() % right.unwrap()),
-        "+" => return Ok(left.unwrap() + right.unwrap()),
-        "-" => return Ok(left.unwrap() - right.unwrap()),
-        _ => {}
-      };
-    }
-
-    // TODO: Operator cannot be empty
-    return Err(tokenizer.err_config.lex_unknown_err(0));
   }
 }

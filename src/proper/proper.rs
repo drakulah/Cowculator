@@ -20,8 +20,18 @@ impl Proper {
     tokens: &Vec<&'a Token>,
     tokenizer: &Tokenizer,
   ) -> Result<Vec<&Token>, ErrorViewConfig> {
+    let mut lp_index = 0;
     let mut paren_count = 1;
     let mut proper_tkns = Vec::new();
+
+    if let Some(token) = tokens.get(*i) {
+      match token.tkn_type {
+        TokenType::LParen => {
+          lp_index = token.tkn_pos;
+        }
+        _ => {}
+      }
+    }
 
     *i += 1;
 
@@ -44,8 +54,11 @@ impl Proper {
       *i += 1;
     }
 
-    println!("Error at 39");
-    return Err(tokenizer.err_config.lex_unknown_err(0));
+    return Err(
+      tokenizer
+        .err_config
+        .lex_expected_closing_paren(lp_index.try_into().unwrap()),
+    );
   }
 
   fn break_lexical_fn_params<'a>(
@@ -54,9 +67,19 @@ impl Proper {
     tokens: &Vec<&'a Token>,
     tokenizer: &Tokenizer,
   ) -> Result<Vec<Vec<&Token>>, ErrorViewConfig> {
+    let mut lp_index = 0;
     let mut paren_count = 1;
     let mut temp_tokens = Vec::new();
     let mut broken_token_groups: Vec<Vec<&Token>> = Vec::new();
+
+    if let Some(token) = tokens.get(*i) {
+      match token.tkn_type {
+        TokenType::LParen => {
+          lp_index = token.tkn_pos;
+        }
+        _ => {}
+      }
+    }
 
     *i += 1;
 
@@ -89,8 +112,11 @@ impl Proper {
       *i += 1;
     }
 
-    println!("Error at 75");
-    return Err(tokenizer.err_config.lex_unknown_err(0));
+    return Err(
+      tokenizer
+        .err_config
+        .lex_expected_closing_paren(lp_index.try_into().unwrap()),
+    );
   }
 
   pub fn proper_literals(
@@ -127,7 +153,11 @@ impl Proper {
               }));
             }
           } else {
-            return Err(tokenizer.err_config.parse_big_int("110"));
+            return Err(
+              tokenizer
+                .err_config
+                .parse_big_int(tkn.tkn_pos as usize, tkn.lexeme.len()),
+            );
           }
         }
         TokenType::Float => {
@@ -152,7 +182,11 @@ impl Proper {
               }));
             }
           } else {
-            return Err(tokenizer.err_config.parse_big_int("137"));
+            return Err(
+              tokenizer
+                .err_config
+                .parse_big_int(tkn.tkn_pos as usize, tkn.lexeme.len()),
+            );
           }
         }
         TokenType::Id => {
@@ -245,7 +279,11 @@ impl Proper {
         }
         TokenType::Dot => {
           if i + 1 >= tokens.len() || tokens.is_empty() {
-            return Err(tokenizer.err_config.parse_big_int("223"));
+            return Err(
+              tokenizer
+                .err_config
+                .lex_unexpected_token(tkn.tkn_pos as usize),
+            );
           }
 
           i += 1;
@@ -253,7 +291,11 @@ impl Proper {
           let next_tkn = tokens[i];
 
           if next_tkn.tkn_type != TokenType::Id {
-            return Err(tokenizer.err_config.parse_big_int("231"));
+            return Err(
+              tokenizer
+                .err_config
+                .lex_unexpected_token(tkn.tkn_pos as usize),
+            );
           }
 
           let mut inline_fn = ProperFnCall {
@@ -287,13 +329,19 @@ impl Proper {
             // TODO: handle inline_fn assigned to operator
           }
         }
-        TokenType::RParen => {}
+        TokenType::RParen => {
+          return Err(
+            tokenizer
+              .err_config
+              .lex_unexpected_token(tkn.tkn_pos as usize),
+          );
+        }
         _ => {
           return Err(
             tokenizer
               .err_config
-              .parse_big_int(&format!("261 {}", tkn.lexeme)),
-          )
+              .lex_unexpected_token(tkn.tkn_pos as usize),
+          );
         }
       }
 

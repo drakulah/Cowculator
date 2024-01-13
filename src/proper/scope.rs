@@ -1,4 +1,4 @@
-use super::{ProperFnCall, ProperScope, OpPriority};
+use super::{OpPriority, ProperFnCall, ProperScope};
 
 impl ProperScope {
   pub fn is_operator(&self) -> bool {

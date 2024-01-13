@@ -1,4 +1,6 @@
-mod config;
+mod lex_err;
+mod parse_err;
+mod util;
 mod view;
 
 #[derive(Debug)]
@@ -21,12 +23,17 @@ impl CowErrorKind {
 #[derive(Debug)]
 pub struct ErrorConfig {
   text: String,
-  err_chunk: usize
+  err_chunk: usize,
+  err_pre_size: usize,
 }
 
 impl ErrorConfig {
-  pub fn new(text: String, err_chunk: usize) -> ErrorConfig {
-    ErrorConfig { text, err_chunk }
+  pub fn new(text: String, err_chunk: usize, err_pre_size: usize) -> ErrorConfig {
+    ErrorConfig {
+      text,
+      err_chunk,
+      err_pre_size,
+    }
   }
 }
 
@@ -42,7 +49,7 @@ pub struct ErrorViewConfig {
 }
 
 pub struct ErrorView {
-  config: ErrorViewConfig
+  config: ErrorViewConfig,
 }
 
 impl ErrorView {

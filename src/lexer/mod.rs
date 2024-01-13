@@ -35,7 +35,7 @@ impl Token {
       tkn_type: token_type,
       lexeme: lexeme.as_ref().to_string(),
       tkn_pos,
-      tkn_len
+      tkn_len,
     }
   }
 
@@ -49,7 +49,7 @@ impl Token {
 #[derive(Debug)]
 pub struct Tokenizer {
   text: String,
-  pub err_config: ErrorConfig
+  pub err_config: ErrorConfig,
 }
 
 impl Tokenizer {

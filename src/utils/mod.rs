@@ -12,6 +12,20 @@ pub fn is_num_tkn(tkn: &Token) -> bool {
   tkn.tkn_type == TokenType::Int || tkn.tkn_type == TokenType::Float
 }
 
+pub trait CoerceAtLeast {
+  fn coerce_at_least(self, min: Self) -> Self;
+}
+
+impl CoerceAtLeast for i32 {
+  fn coerce_at_least(self, min: i32) -> i32 {
+    if self < min {
+      min
+    } else {
+      self
+    }
+  }
+}
+
 pub trait CoerceAtMost {
   fn coerce_at_most(self, max: Self) -> Self;
 }

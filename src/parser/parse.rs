@@ -15,11 +15,11 @@ impl Parser {
     &self,
     scope: Vec<ProperScope>,
     tokenizer: &Tokenizer,
-  ) -> Result<Tree, ErrorViewConfig> {
+  ) -> Result<Option<Tree>, ErrorViewConfig> {
     let mut i = 0;
 
     if scope.len() == 1 {
-      return Ok(Tree {
+      return Ok(Some(Tree {
         op: Some(ProperOpLiteral {
           value: "+".to_string(),
           priority: OpPriority::Low,
@@ -31,11 +31,14 @@ impl Parser {
             inline_fn: None,
           }),
         ))),
-      });
+      }));
     } else if scope.len() > 2 {
-      return self.parse_low_priority_op(&mut i, &scope, tokenizer);
+      return match self.parse_low_priority_op(&mut i, &scope, tokenizer) {
+        Ok(e) => Ok(Some(e)),
+        Err(e) => Err(e),
+      };
     } else {
-      return Err(tokenizer.err_config.lex_unknown_err(0));
+      return Ok(None);
     }
   }
 

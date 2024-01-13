@@ -5,11 +5,13 @@
 # Dynamic plugins .dll
 bin/
 
-
 # Added by cargo
-
 /target
+Cargo.lock
+
+# Custom
 error.md
 tree.diff
 .test.js
 temp.jsonc
+.idea
