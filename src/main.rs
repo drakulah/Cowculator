@@ -12,9 +12,12 @@ pub mod proper;
 pub mod utils;
 
 fn main() {
-  let code = "2 * 3 / PI.round() + 4";
+  // let code = "2 * 3 / PI.round() + 4";
   // let code = "1 + 1 - 2 * 3 / 2 - 6 + 2 + 1 % 9 + 7 * 8 % 6";
   // let code = "2 + 5 - 5 * PI - (12 + 4) - 0b101010 + 0xffffff";
+
+  let args: Vec<String> = env::args().skip(1).collect();
+  let code = args.join("");
 
   let err_config = ErrorConfig::new(code.to_string(), 15, 50);
   let lx = lexer::Tokenizer::new(code.to_string(), err_config);
