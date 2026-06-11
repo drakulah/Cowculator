@@ -21,6 +21,12 @@ $ ./cowculator "143 * 642 # 32"
     |
   1 | 143 * 642 # 32
     |           ~
+
+$ ./cowculator "(2 + 5 - 5 * PI - (12 + 4) - 6 + 2 + 1 % 9 + 7 * 8 % 6).floor()) " 
+1:63: lexer err: unexpected token `)`
+    |
+  1 | … - (12 + 4) - 6 + 2 + 1 % 9 + 7 * 8 % 6).floor()) 
+    |      
 ```
 
 Now in `main.rs` add line:
